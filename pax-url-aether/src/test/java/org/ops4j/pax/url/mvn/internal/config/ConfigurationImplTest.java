@@ -626,4 +626,20 @@ public class ConfigurationImplTest
         verify( propertyResolver );
     }
 
+	@Test
+    public void getLocalRepositoryFromSettingsWithSpace() throws FileNotFoundException {
+        PropertyResolver propertyResolver = createMock(PropertyResolver.class);
+        File validSettings = FileUtils.getFileFromClasspath("user settings/maven_user_settings.xml");
+        expect(propertyResolver.get("org.ops4j.pax.url.mvn.localRepository")).andReturn(null);
+        expect(propertyResolver.get("org.ops4j.pax.url.mvn.useFallbackRepositories")).andReturn(null);
+        expect(propertyResolver.get("org.ops4j.pax.url.mvn.settings")).andReturn(validSettings.getAbsolutePath());
+        replay(propertyResolver);
+
+        MavenConfiguration config = new MavenConfigurationImpl(propertyResolver, PID);
+        String localRepository = config.getSettings().getLocalRepository();
+        assertNotNull(localRepository);
+        assertEquals("My path/.m2/repository", localRepository);
+        verify(propertyResolver);
+    }
+
 }

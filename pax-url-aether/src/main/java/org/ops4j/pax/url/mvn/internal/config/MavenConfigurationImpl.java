@@ -22,6 +22,7 @@ import java.io.File;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -581,8 +582,13 @@ public class MavenConfigurationImpl extends PropertyStore implements MavenConfig
     }
 
     private String getSettingsPath() {
-        URL url = getSettingsFileUrl();
-        return url == null ? null : url.getPath();
+         URL url = getSettingsFileUrl();
+        try {
+            return url == null ? null : new File(url.toURI().getSchemeSpecificPart()).getAbsolutePath();
+        } catch (URISyntaxException e) {
+            //this should never happend but we handle it anyway.
+            return url.getPath();
+        }
     }
 
     private String getLocalRepoPath(PropertyResolver props) {
