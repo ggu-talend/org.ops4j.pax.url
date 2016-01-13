@@ -6,7 +6,7 @@ Bundle-Version:\
 
 Bundle-SymbolicName:\
   ${bundle.symbolicName}; singleton:=true  
-  
+
 Export-Service:\
   org.osgi.service.url.URLStreamHandlerService; url.handler.protocol=mvn, \
   org.ops4j.pax.url.mvn.MavenResolver
