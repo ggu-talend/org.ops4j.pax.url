@@ -3,6 +3,7 @@ package org.ops4j.pax.url.mvn.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.jetty.server.Handler;
@@ -67,9 +69,13 @@ public class ProxyTest {
 
         System.clearProperty("https.proxyHost");
         System.clearProperty("https.proxyPort");
-
+        System.clearProperty("https.proxyUser");
+        System.clearProperty("https.proxyPassword");
+        
         System.clearProperty("http.proxyHost");
         System.clearProperty("http.proxyPort");
+        System.clearProperty("http.proxyUser");
+        System.clearProperty("http.proxyPassword");
     }
 
     @Test
@@ -150,6 +156,8 @@ public class ProxyTest {
         assertEquals("localhost", proxy.getHost());
         assertEquals(8778, proxy.getPort());
         assertEquals("http", proxy.getType());
+        
+        assertThat(proxy.getAuthentication(), is(nullValue()));
     }
 
     /**
@@ -174,6 +182,33 @@ public class ProxyTest {
         assertEquals("localhost", proxy.getHost());
         assertEquals(8080, proxy.getPort());
         assertEquals("http", proxy.getType());
+        assertThat(proxy.getAuthentication(), is(nullValue()));
+    }
+
+    @Test
+    public void javaHttpProxyWithAuthForHttpURL() throws Exception {
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "8778");
+        System.setProperty("http.proxyUser", "foo");
+        System.setProperty("http.proxyPassword", "bar");
+
+        AetherBasedResolver resolver = createResolver("http");
+        final List<RemoteRepository> repositories = resolver.getRepositories();
+        assertEquals(1, repositories.size());
+
+        final RemoteRepository remoteRepository = repositories.get(0);
+        assertEquals("qfdqfqfqf.fra", remoteRepository.getHost());
+        assertEquals("fake", remoteRepository.getId());
+        assertEquals("http", remoteRepository.getProtocol());
+
+        final Proxy proxy = remoteRepository.getProxy();
+
+        assertEquals("localhost", proxy.getHost());
+        assertEquals(8778, proxy.getPort());
+        assertEquals("http", proxy.getType());
+
+        final Authentication authentication = proxy.getAuthentication();
+        assertNotNull(authentication);
     }
 
     /**
@@ -198,6 +233,7 @@ public class ProxyTest {
         assertEquals("localhost", proxy.getHost());
         assertEquals(8778, proxy.getPort());
         assertEquals("http", proxy.getType());
+        assertThat(proxy.getAuthentication(), is(nullValue()));
     }
 
     /**
@@ -222,6 +258,7 @@ public class ProxyTest {
         assertEquals("localhost", proxy.getHost());
         assertEquals(8778, proxy.getPort());
         assertEquals("https", proxy.getType());
+        assertThat(proxy.getAuthentication(), is(nullValue()));
     }
 
     /**
@@ -247,6 +284,7 @@ public class ProxyTest {
         assertEquals("abc.com", proxy.getHost());
         assertEquals(8080, proxy.getPort());
         assertEquals("http", proxy.getType());
+        assertThat(proxy.getAuthentication(), is(nullValue()));
     }
 
     /**
@@ -272,6 +310,7 @@ public class ProxyTest {
         assertEquals("localhost", proxy.getHost());
         assertEquals(8778, proxy.getPort());
         assertEquals("https", proxy.getType());
+        assertThat(proxy.getAuthentication(), is(nullValue()));
     }
 
     /**
