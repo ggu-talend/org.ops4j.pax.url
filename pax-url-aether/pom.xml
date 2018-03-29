@@ -11,7 +11,7 @@
 
     <groupId>org.ops4j.pax.url</groupId>
     <artifactId>pax-url-aether</artifactId>
-    <version>2.4.5-Talend</version>
+    <version>2.4.6-Talend</version>
     <packaging>bundle</packaging>
 
     <name>OPS4J Pax Url - aether:</name>
